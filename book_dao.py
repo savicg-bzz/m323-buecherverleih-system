@@ -12,11 +12,9 @@ class BookDao:
     """
     This class handles all the database operations related to the book entity.
     """
-
     def __init__(self, db_file=BOOK_DB_NAME):
         self.conn = sqlite3.connect(db_file, check_same_thread=False)
         self.cursor = self.conn.cursor()
-        self.create_table()
 
     def create_table(self):
         """

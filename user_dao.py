@@ -10,17 +10,17 @@ USER_DB_NAME = 'user.db'
 
 class UserDao:
     """
-    This class is responsible for handling user data.
+    This class handles all the database operations related to the user entity.
     """
 
     def __init__(self, db_file=USER_DB_NAME):
         self.conn = sqlite3.connect(db_file, check_same_thread=False)
         self.cursor = self.conn.cursor()
-        self.create_table()
+
 
     def create_table(self):
         """
-        This method creates the user table.
+            This method creates the table if it does not exist.
         """
         try:
             self.cursor.execute('''

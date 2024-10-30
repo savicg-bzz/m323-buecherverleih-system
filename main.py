@@ -2,8 +2,6 @@
 Main file for the project
 set up the database and run the app
 """
-from crypt import methods
-
 from flask import Flask, jsonify
 
 from book import Book
@@ -21,6 +19,10 @@ app.register_blueprint(user_blueprint)
 
 @app.route('/', methods=['GET'])
 def greet():
+    """
+    This method returns a greeting message.
+    :return:
+    """
     return jsonify("Hello")
 
 
