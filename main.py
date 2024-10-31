@@ -2,7 +2,6 @@
 Main file for the project
 set up the database and run the app
 """
-from itertools import takewhile
 
 from flask import Flask, jsonify
 

@@ -3,7 +3,7 @@ This module contains the blueprint for the rent book API.
 """
 import logging
 
-# pylint: disable=no-else-return
+# pylint: disable=no-else-return,broad-exception-caught,logging-fstring-interpolation
 from flask import Blueprint, request, jsonify
 
 from book import Book
@@ -60,6 +60,11 @@ def get_rented_book_by_id(rent_id):
 
 @rent_book_blueprint.route('/rented_books_by_user_id/<int:user_id>', methods=['GET'])
 def get_rented_books_by_user_id(user_id):
+    """
+    This method returns all the rented books by user id.
+    :param user_id:
+    :return:
+    """
     try:
         rented_books = rent_book_dao.get_rented_books_by_user_id(user_id)
         if not rented_books:
@@ -112,6 +117,10 @@ def delete_rented_books_by_user_id(user_id):
 
 @rent_book_blueprint.route('/update_rent', methods=['PUT'])
 def update_rent():
+    """
+    This method updates a rent.
+    :return:
+    """
     data = request.get_json()
     updated_rent = rent_book_dao.update_rented_book(
         RentedBook(data['id'], data['user'], data['book'], data['rented']))
