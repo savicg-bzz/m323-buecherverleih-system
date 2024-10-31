@@ -40,7 +40,8 @@ class UserDao:
         username = user['username'] if isinstance(user, dict) else user.username
         password = user['password'] if isinstance(user, dict) else user.password
         try:
-            self.cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, password))
+            self.cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)',
+                                (username, password))
             self.conn.commit()
             return True
         except sqlite3.IntegrityError:
@@ -76,7 +77,7 @@ class UserDao:
             return User(row[0], row[1], row[2])
         return None
 
-    def delete_user_by_id_and_password(self, user_id, password):
+    def delete_user_by_id(self, user_id):
         """
         This method deletes a user from the database.
         """

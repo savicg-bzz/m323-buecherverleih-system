@@ -67,15 +67,14 @@ def add_user():
     return jsonify({'message': 'User created'}), 201
 
 
-@user_blueprint.route('/deleteUser/<int:user_id>,<string:password>', methods=['DELETE'])
-def delete_user_by_id_and_password(user_id, password):
+@user_blueprint.route('/deleteUser/<int:user_id>', methods=['DELETE'])
+def delete_user_by_id_and_password(user_id):
     """
     This method deletes a user by its id and password.
     :param user_id:
-    :param password:
     :return message:
     """
-    if user_dao.delete_user_by_id_and_password(user_id, password):
+    if user_dao.delete_user_by_id(user_id):
         return jsonify({'message': 'User deleted'}), 200
     else:
         return jsonify({'message': 'User not found or not deleted'}), 404

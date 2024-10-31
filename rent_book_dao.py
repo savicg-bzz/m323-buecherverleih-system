@@ -1,7 +1,10 @@
+"""
+This module contains the data access object for rented books.
+"""
 import sqlite3
 
 
-from rent_book import RentedBooks
+from rent_book import RentedBook
 from user_dao import UserDao, USER_DB_NAME
 from book_dao import BookDao, BOOK_DB_NAME
 
@@ -39,34 +42,47 @@ class RentedBookDao:
             print(f'Error creating table: {e}')
 
     def add_rented_book(self, rented_book):
+        """
+        This method adds a rented book to the database.
+        :param rented_book:
+        :return:
+        """
         try:
             self.cursor.execute('''
                INSERT INTO rented_books (user_id, book_id, rented) VALUES (?, ?, ?)
            ''', (rented_book.user.user_id, rented_book.book.id, rented_book.rented))
             self.conn.commit()
             return True
-        except sqlite3.IntegrityError as e:
-            print(e)
+        except sqlite3.IntegrityError:
             print('Book already rented')
             return False
 
     def get_all_rented_books(self):
+        """
+        This method returns all rented books.
+        :return:
+        """
         self.cursor.execute('SELECT * FROM rented_books')
         rows = self.cursor.fetchall()
         rented_books = []
         for row in rows:
             user = self.user_dao.get_one_user(row[1])
             book = self.book_dao.get_book_by_id(row[2])
-            rented_books.append(RentedBooks(id=row[0], user=user, book=book, rented=row[3]))
+            rented_books.append(RentedBook(id=row[0], user=user, book=book, rented=row[3]))
         return rented_books
 
     def get_rent_by_id(self, rent_id):
+        """
+        This method returns a rented book by its id.
+        :param rent_id:
+        :return:
+        """
         self.cursor.execute('SELECT * FROM rented_books WHERE id = ?', (rent_id,))
         row = self.cursor.fetchone()
         if row:
             user = self.user_dao.get_one_user(row[1])  # Fetch User instance based on user_id
             book = self.book_dao.get_book_by_id(row[2])  # Fetch Book instance based on isbn
-            return RentedBooks(id=row[0], user=user, book=book, rented=bool(row[3]))
+            return RentedBook(id=row[0], user=user, book=book, rented=bool(row[3]))
         return None
 
     def get_rented_books_by_user_id(self, user_id):
@@ -76,7 +92,7 @@ class RentedBookDao:
         self.cursor.execute('SELECT * FROM rented_books WHERE user_id = ?', (user_id,))
         rows = self.cursor.fetchall()
         rented_books = [
-            RentedBooks(
+            RentedBook(
                 row[0],
                 self.user_dao.get_one_user(row[1]),
                 self.book_dao.get_book_by_id(row[2]),
@@ -106,6 +122,11 @@ class RentedBookDao:
         return False
 
     def update_rented_book(self, rented_book):
+        """
+        This method updates a rented book.
+        :param rented_book:
+        :return:
+        """
         self.cursor.execute('''
                UPDATE rented_books SET rented = ? WHERE id = ?
            ''', (rented_book.rented, rented_book.id))

@@ -1,5 +1,10 @@
+"""
+This module contains the blueprint for the rent book API.
+"""
+# pylint: disable=no-else-return
 from flask import Blueprint, request, jsonify
 
+from rent_book import RentedBook
 from rent_book_dao import RentedBookDao, RENTED_BOOK_DB_NAME
 
 rent_book_blueprint = Blueprint('rent_book_blueprint', __name__)
@@ -19,8 +24,13 @@ def serialize_data(data):
     else:
         return data
 
+
 @rent_book_blueprint.route('/rented_books', methods=['GET'])
 def get_all_rented_books():
+    """
+    This method returns all the rented books from the database.
+    :return:
+    """
     rented_books = rent_book_dao.get_all_rented_books()
     try:
         rented_books_dict = [serialize_data(book) for book in rented_books]
@@ -28,7 +38,6 @@ def get_all_rented_books():
     except TypeError as e:
         print(f"Serialization error: {e}")  # Log the error to locate problematic data
         return jsonify({"error": "Data serialization issue"}), 500
-
 
 
 @rent_book_blueprint.route('/rented_books/<int:rent_id>', methods=['GET'])
@@ -56,13 +65,15 @@ def get_rented_books_by_user_id(user_id):
     return jsonify([rented_book.__dict__ for rented_book in rented_books]), 200
 
 
-@rent_book_blueprint.route('/create_rent/<int:user_id>,<int:book_id>', methods=['POST'])
-def add_rent(user_id, book_id):
+@rent_book_blueprint.route('/create_rent', methods=['POST'])
+def add_rent():
     """
     This method adds a rent to the database.
     :return message:
     """
-    rent_book_dao.add_rented_book(user_id, book_id)
+    data = request.get_json()
+    rent_book_dao.add_rented_book(RentedBook(data['id'], data['user'],
+                                             data['book'], data['rented']))
     return jsonify({'message': 'Rent created'}), 201
 
 
@@ -92,15 +103,15 @@ def delete_rented_books_by_user_id(user_id):
         return jsonify({'message': 'Rented books not found or not deleted'}), 404
 
 
-@rent_book_blueprint.route('/update_rent/<int:rent_id>', methods=['PUT'])
-def update_rent(rent_id):
+@rent_book_blueprint.route('/update_rent', methods=['PUT'])
+def update_rent():
     """
     This method updates a rent.
-    :param rent_id:
     :return message:
     """
     data = request.get_json()
-    updated_rent = rent_book_dao.update_rented_book(rent_id, data['user_id'], data['isbn'], data['rented'])
+    updated_rent = rent_book_dao.update_rented_book(
+        RentedBook(data['id'], data['user'], data['book'], data['is_returned']))
     if updated_rent:
         return jsonify({'message': 'Rent updated'}), 200
     else:

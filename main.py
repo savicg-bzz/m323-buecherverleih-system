@@ -6,6 +6,7 @@ from flask import Flask, jsonify
 
 # blueprints
 from books_blueprint import book_blueprint
+from rent_book import RentedBook
 from user_blueprint import user_blueprint
 from rent_book_blueprint import rent_book_blueprint
 # dao
@@ -39,9 +40,9 @@ def generate_data():
     # create books
     book_dao = BookDao(BOOK_DB_NAME)
     book_dao.create_table()
-    book_dao.add_book(Book(1,'1234', 'Book1', 'Author1'))
-    book_dao.add_book(Book(2,'5678', 'Book2', 'Author2'))
-    book_dao.add_book(Book(3,'91011', 'Book3', 'Author3'))
+    book_dao.add_book(Book(1, '1234', 'Book1', 'Author1'))
+    book_dao.add_book(Book(2, '5678', 'Book2', 'Author2'))
+    book_dao.add_book(Book(3, '91011', 'Book3', 'Author3'))
     book_dao.close()
 
     # create users
@@ -54,9 +55,12 @@ def generate_data():
     # create rented books
     rented_book_dao = RentedBookDao(RENTED_BOOK_DB_NAME)
     rented_book_dao.create_table()
-    rented_book_dao.add_rented_book(1, '1234')
-    rented_book_dao.add_rented_book(2, '5678')
-    rented_book_dao.add_rented_book(1, '91011')
+    rented_book_dao.add_rented_book(
+        RentedBook(1, User(1, 'admin', 'admin'), Book(1, '1234', 'Book1', 'Author1'), True))
+    rented_book_dao.add_rented_book(RentedBook(2, User(2, 'user', 'user'),
+                                               Book(2, '5678', 'Book2', 'Author2'), False))
+    rented_book_dao.add_rented_book(
+        RentedBook(3, User(1, 'admin', 'admin'), Book(3, '91011', 'Book3', 'Author3'), True))
     rented_book_dao.close()
 
 

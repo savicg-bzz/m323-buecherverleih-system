@@ -1,10 +1,13 @@
+"""
+This module represents a rented book.
+"""
 from dataclasses import dataclass
 from user import User
 from book import Book
 
 
 @dataclass(frozen=True)
-class RentedBooks:
+class RentedBook:
     """
     This class represents a rented book.
     """

@@ -41,7 +41,7 @@ def add_book():
     :return message:
     """
     data = request.get_json()
-    new_book = Book(data['isbn'], data['title'], data['author'])
+    new_book = Book(data['id'],data['isbn'], data['title'], data['author'])
     book_dao.add_book(new_book)
     return jsonify({'message': 'Book created'}), 201
 
@@ -59,15 +59,14 @@ def delete_book(isbn):
         return jsonify({'message': 'Book not found or not deleted'}), 404
 
 
-@book_blueprint.route('/updateBook/<int:isbn>', methods=['PUT'])
-def update_book(isbn):
+@book_blueprint.route('/updateBook', methods=['PUT'])
+def update_book():
     """
     This method updates a book.
-    :param isbn:
     :return message:
     """
     data = request.get_json()
-    updated_book = Book(isbn, data['title'], data['author'])
+    updated_book = Book(data['id'],data['isbn'], data['title'], data['author'])
     if book_dao.update_book(updated_book):
         return jsonify({'message': 'Book updated'}), 200
     else:
