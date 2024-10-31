@@ -8,6 +8,7 @@ class Book:
     """
     This class represents a book.
     """
+    id: int
     isbn: str
     title: str
     author: str

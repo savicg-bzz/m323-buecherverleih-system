@@ -17,7 +17,13 @@ def get_all_users():
     :return list of users in json format:
     """
     users = user_dao.get_all_users()
-    return jsonify([user.__dict__ for user in users]), 200
+    users_dict = []
+    for user in users:
+        user_dict = user.__dict__
+        if isinstance(user_dict.get('password'), bytes):
+            user_dict['password'] = user_dict['password'].decode('utf-8')
+        users_dict.append(user_dict)
+    return jsonify(users_dict), 200
 
 
 @user_blueprint.route('/users/<int:user_id>', methods=['GET'])
@@ -35,15 +41,14 @@ def get_user(user_id):
         return jsonify({'message': 'User not found'}), 404
 
 
-@user_blueprint.route('/user_by_id_and_password/<int:user_id>,<string:password>', methods=['GET'])
-def get_user_by_id_and_password(user_id, password):
+@user_blueprint.route('/user_by_id_and_password/<int:user_id>', methods=['GET'])
+def get_user_by_id_and_password(user_id):
     """
     This method returns a user by its id and password.
     :param user_id:
-    :param password:
     :return user json format:
     """
-    user = user_dao.get_user_by_username_and_password(user_id, password)
+    user = user_dao.get_user_by_username(user_id)
     if user:
         return jsonify(user.__dict__), 200
     else:

@@ -1,5 +1,5 @@
 """
-This module contains the BookDAO class which is responsible for handling all the database
+This module contains the BookDao class which is responsible for handling all the database
 operations related to the book entity.
 """
 import sqlite3
@@ -12,81 +12,86 @@ class BookDao:
     """
     This class handles all the database operations related to the book entity.
     """
+
     def __init__(self, db_file=BOOK_DB_NAME):
         self.conn = sqlite3.connect(db_file, check_same_thread=False)
         self.cursor = self.conn.cursor()
+        self.create_table()
 
     def create_table(self):
         """
-        creates the table if it does not exist
-        :return:
+        Creates the table if it does not exist.
         """
-        try:
-            self.cursor.execute('''
-                CREATE TABLE IF NOT EXISTS books (
-                    isbn TEXT PRIMARY KEY,
-                    title TEXT,
-                    author TEXT
-                )
-            ''')
-            self.conn.commit()
-        except sqlite3.OperationalError:
-            print('Table already exists')
+        self.cursor.execute('''
+            CREATE TABLE IF NOT EXISTS books (
+                id INTEGER PRIMARY KEY,
+                isbn TEXT UNIQUE,
+                title TEXT,
+                author TEXT
+            )
+        ''')
+        self.conn.commit()
 
     def add_book(self, book):
         """
-        This method adds a book to the database.
-        :param book:
+        Adds a book to the database.
+        :param book: Book instance
+        :return: True if added, False if book exists
         """
         try:
-            self.cursor.execute('INSERT INTO books (isbn, title, author) VALUES (?, ?, ?)',
-                                (book.isbn, book.title, book.author))
+            self.cursor.execute(
+                'INSERT INTO books (id, isbn, title, author) VALUES (?,?, ?, ?)',
+                (book.id, book.isbn, book.title, book.author)
+            )
             self.conn.commit()
+            return True
         except sqlite3.IntegrityError:
             print('Book already exists')
+            return False
 
     def get_all_books(self):
         """
-        This method returns all the books from the database.
-        :return:
+        Returns all books from the database.
+        :return: list of Book instances
         """
         self.cursor.execute('SELECT * FROM books')
         rows = self.cursor.fetchall()
-        books = [Book(row[0], row[1], row[2]) for row in rows]
-        return books
+        return [Book(row[0], row[1], row[2], row[3]) for row in rows]
 
-    def get_book_by_isbn(self, isbn):
+    def get_book_by_id(self, book_id):
         """
-        This method returns a book by its isbn.
-        :param isbn:
-        :return book or None:
+        Returns a book by its isbn.
+        :param book_id: int
+        :return: Book instance or None
         """
-        self.cursor.execute('SELECT * FROM books WHERE isbn = ?', isbn)
+        self.cursor.execute('SELECT * FROM books WHERE id = ?', (book_id,))
         row = self.cursor.fetchone()
-        if row:
-            return Book(row[0], row[1], row[2])
-        return None
+        return Book(*row) if row else None
 
-    def delete_book(self, isbn):
+    def delete_book_by_id(self, book_id):
         """
-        This method deletes a book by its isbn.
-        :param isbn:
-        :return Boolean:
+        Deletes a book by its isbn.
+        :param book_id: str
+        :return: True if deleted, False if not found
         """
-        self.cursor.execute('DELETE FROM books WHERE isbn = ?', isbn)
+        self.cursor.execute('DELETE FROM books WHERE id = ?', (book_id,))
         if self.cursor.rowcount > 0:
             self.conn.commit()
             return True
         return False
 
+    # book_dao.py
+
     def update_book(self, updated_book):
         """
-        This method updates a book.
-        :param updated_book:
-        :return Boolean:
+        Updates a book.
+        :param updated_book: Book instance with updated data
+        :return: True if updated, False if not found
         """
-        self.cursor.execute('UPDATE books SET title = ?, author = ? WHERE isbn = ?',
-                            (updated_book.title, updated_book.author, updated_book.isbn))
+        self.cursor.execute(
+            'UPDATE books SET title = ?, author = ?, isbn = ? WHERE id = ?',
+            (updated_book.title, updated_book.author, updated_book.isbn, updated_book.id)
+        )
         if self.cursor.rowcount > 0:
             self.conn.commit()
             return True
@@ -94,7 +99,6 @@ class BookDao:
 
     def close(self):
         """
-        This method closes the connection to the database.
-        :return:
+        Closes the connection to the database.
         """
         self.conn.close()

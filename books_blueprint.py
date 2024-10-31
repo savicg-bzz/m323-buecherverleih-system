@@ -27,7 +27,7 @@ def get_book_by_isbn(isbn):
     :param isbn:
     :return book json format:
     """
-    book = book_dao.get_book_by_isbn(isbn)
+    book = book_dao.get_book_by_id(isbn)
     if book:
         return jsonify(book.__dict__), 200
     else:
@@ -53,7 +53,7 @@ def delete_book(isbn):
     :param isbn:
     :return message:
     """
-    if book_dao.delete_book(isbn):
+    if book_dao.delete_book_by_id(isbn):
         return jsonify({'message': 'Book deleted'}), 200
     else:
         return jsonify({'message': 'Book not found or not deleted'}), 404
