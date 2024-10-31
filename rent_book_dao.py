@@ -3,7 +3,6 @@ This module contains the data access object for rented books.
 """
 import sqlite3
 
-
 from rent_book import RentedBook
 from user_dao import UserDao, USER_DB_NAME
 from book_dao import BookDao, BOOK_DB_NAME
@@ -27,6 +26,7 @@ class RentedBookDao:
         This method creates the table if it does not exist.
         """
         try:
+            self.cursor.execute('''DROP TABLE IF EXISTS rented_books''')
             self.cursor.execute('''
                 CREATE TABLE IF NOT EXISTS rented_books (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -96,7 +96,7 @@ class RentedBookDao:
                 row[0],
                 self.user_dao.get_one_user(row[1]),
                 self.book_dao.get_book_by_id(row[2]),
-                row[3]
+                bool(row[3])
             ) for row in rows
         ]
         return rented_books
@@ -140,3 +140,10 @@ class RentedBookDao:
         self.conn.close()
         self.user_dao.close()
         self.book_dao.close()
+
+    def drop_table(self):
+        """
+        This method drops the table.
+        """
+        self.cursor.execute('DROP TABLE IF EXISTS rented_books')
+        self.conn.commit()

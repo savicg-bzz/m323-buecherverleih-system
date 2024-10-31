@@ -1,11 +1,15 @@
 """
 This module contains the blueprint for the rent book API.
 """
+import logging
+
 # pylint: disable=no-else-return
 from flask import Blueprint, request, jsonify
 
+from book import Book
 from rent_book import RentedBook
 from rent_book_dao import RentedBookDao, RENTED_BOOK_DB_NAME
+from user import User
 
 rent_book_blueprint = Blueprint('rent_book_blueprint', __name__)
 rent_book_dao = RentedBookDao(db_file=RENTED_BOOK_DB_NAME)
@@ -56,13 +60,14 @@ def get_rented_book_by_id(rent_id):
 
 @rent_book_blueprint.route('/rented_books_by_user_id/<int:user_id>', methods=['GET'])
 def get_rented_books_by_user_id(user_id):
-    """
-    This method returns all the rented books by user id.
-    :param user_id:
-    :return list of rented books in json format:
-    """
-    rented_books = rent_book_dao.get_rented_books_by_user_id(user_id)
-    return jsonify([rented_book.__dict__ for rented_book in rented_books]), 200
+    try:
+        rented_books = rent_book_dao.get_rented_books_by_user_id(user_id)
+        if not rented_books:
+            return jsonify({'message': 'Rented book not found'}), 404
+        return jsonify([rented_book.__dict__ for rented_book in rented_books]), 200
+    except Exception as e:
+        logging.error(f"Error fetching rented books for user_id {user_id}: {e}")
+        return jsonify({'message': 'Internal Server Error'}), 500
 
 
 @rent_book_blueprint.route('/create_rent', methods=['POST'])
@@ -72,8 +77,10 @@ def add_rent():
     :return message:
     """
     data = request.get_json()
-    rent_book_dao.add_rented_book(RentedBook(data['id'], data['user'],
-                                             data['book'], data['rented']))
+    user = User(**data['user'])
+    book = Book(**data['book'])
+    rented_book = RentedBook(id=data['id'], user=user, book=book, rented=data['rented'])
+    rent_book_dao.add_rented_book(rented_book)
     return jsonify({'message': 'Rent created'}), 201
 
 
@@ -105,13 +112,9 @@ def delete_rented_books_by_user_id(user_id):
 
 @rent_book_blueprint.route('/update_rent', methods=['PUT'])
 def update_rent():
-    """
-    This method updates a rent.
-    :return message:
-    """
     data = request.get_json()
     updated_rent = rent_book_dao.update_rented_book(
-        RentedBook(data['id'], data['user'], data['book'], data['is_returned']))
+        RentedBook(data['id'], data['user'], data['book'], data['rented']))
     if updated_rent:
         return jsonify({'message': 'Rent updated'}), 200
     else:

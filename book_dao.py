@@ -22,6 +22,7 @@ class BookDao:
         """
         Creates the table if it does not exist.
         """
+        self.cursor.execute('''DROP TABLE IF EXISTS books''')
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS books (
                 id INTEGER PRIMARY KEY,
@@ -102,3 +103,10 @@ class BookDao:
         Closes the connection to the database.
         """
         self.conn.close()
+
+    def drop_table(self):
+        """
+        Drops the table.
+        """
+        self.cursor.execute('DROP TABLE IF EXISTS books')
+        self.conn.commit()

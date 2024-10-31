@@ -34,7 +34,7 @@ def get_book_by_isbn(isbn):
         return jsonify({'message': 'Book not found'}), 404
 
 
-@book_blueprint.route('/createBook', methods=['POST'])
+@book_blueprint.route('/add_book', methods=['POST'])
 def add_book():
     """
     This method adds a book to the database.

@@ -2,6 +2,8 @@
 Main file for the project
 set up the database and run the app
 """
+from itertools import takewhile
+
 from flask import Flask, jsonify
 
 # blueprints
@@ -38,6 +40,7 @@ def generate_data():
     This method generates data for the database.
     """
     # create books
+
     book_dao = BookDao(BOOK_DB_NAME)
     book_dao.create_table()
     book_dao.add_book(Book(1, '1234', 'Book1', 'Author1'))
@@ -46,13 +49,13 @@ def generate_data():
     book_dao.close()
 
     # create users
+
     user_dao = UserDao(USER_DB_NAME)
     user_dao.create_table()
     user_dao.add_user(User(1, 'admin', 'admin'))
     user_dao.add_user(User(2, 'user', 'user'))
     user_dao.close()
 
-    # create rented books
     rented_book_dao = RentedBookDao(RENTED_BOOK_DB_NAME)
     rented_book_dao.create_table()
     rented_book_dao.add_rented_book(

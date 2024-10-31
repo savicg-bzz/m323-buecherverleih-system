@@ -21,6 +21,7 @@ class UserDao:
             This method creates the table if it does not exist.
         """
         try:
+            self.cursor.execute('''DROP TABLE IF EXISTS users''')
             self.cursor.execute('''
                 CREATE TABLE IF NOT EXISTS users (
                     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -109,3 +110,11 @@ class UserDao:
         This method closes the connection to the database.
         """
         self.conn.close()
+
+    def drop_table(self):
+        """
+        This method drops the table.
+        """
+        self.cursor.execute('DROP TABLE IF EXISTS users')
+        self.conn.commit()
+        return True
