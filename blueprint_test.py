@@ -15,6 +15,8 @@ from user import User
 from user_blueprint import user_blueprint
 from user_dao import UserDao
 
+import tempfile
+
 
 @pytest.fixture
 def app():
@@ -58,28 +60,26 @@ def book_dao():
 
 @pytest.fixture
 def rented_book_dao():
-    """
-    Create a RentedBookDao with an in-memory database and initialize the table
-    :return:
-    """
-    # Create RentedBookDao with an in-memory database and initialize all tables
-    rented_book_dao_user_dao = UserDao(":memory:")
-    rented_book_dao_book_dao = BookDao(":memory:")
-    rented_book_dao_user_dao.create_table()
-    rented_book_dao_book_dao.create_table()
+    """Create a RentedBookDao with a temporary SQLite database."""
+    with tempfile.NamedTemporaryFile(suffix='.db') as temp_db:
+        db_path = temp_db.name
 
-    dao = RentedBookDao(":memory:")
-    dao.create_table()
+        # Initialize DAOs with the file-based database path
+        rented_book_dao_user_dao = UserDao(db_path)
+        rented_book_dao_book_dao = BookDao(db_path)
 
-    # Inject dependencies into RentedBookDao for access to users and books tables
-    dao.user_dao = rented_book_dao_user_dao
-    dao.book_dao = rented_book_dao_book_dao
-    yield dao
+        rented_book_dao_user_dao.create_table()
+        rented_book_dao_book_dao.create_table()
 
-    # Close all DAOs to properly close database connections
-    dao.close()
-    rented_book_dao_user_dao.close()
-    rented_book_dao_book_dao.close()
+        dao = RentedBookDao(db_path)
+        dao.create_table()
+
+        yield dao  # Provide the DAO for testing
+
+        # Clean up resources by closing DAO connections
+        rented_book_dao_user_dao.close()
+        rented_book_dao_book_dao.close()
+        dao.close()
 
 
 def test_add_user(app):
@@ -364,7 +364,7 @@ def test_delete_book(app, book_dao):
         list_of_books = book_dao.get_all_books()
         response = client.delete(f'/deleteBook/{len(list_of_books) + 100000}')
         assert response.status_code == 404
-        assert response.json == {'message': 'Book not found or not deleted'}
+        assert response.json == {'message': 'Book not found'}
 
         book_dao.add_book(Book(1, '123', 'Test Book', 'Author'))
         client.post('/add_book',
@@ -388,3 +388,7 @@ def test_close(book_dao, user_dao, rented_book_dao):
     book_dao.close()
     user_dao.close()
     rented_book_dao.close()
+
+
+if __name__ == '__main__':
+    pytest.main(['-vv'])
