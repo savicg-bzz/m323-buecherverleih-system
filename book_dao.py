@@ -50,14 +50,30 @@ class BookDao:
             print('Book already exists')
             return False
 
-    def get_all_books(self):
+        # In book_dao.py
+
+        # Existing methods...
+
+    def get_all_books(self, sort_by_author=False, sort_by_title=False):
         """
-        Returns all books from the database.
-        :return: list of Book instances
+        Retrieves all books from the database and optionally sorts them by author and/or title.
+        :param sort_by_author: Sort books by author if True (optional).
+        :param sort_by_title: Sort books by title if True (optional).
+        :return: A sorted list of book objects.
         """
-        self.cursor.execute('SELECT * FROM books')
-        rows = self.cursor.fetchall()
-        return [Book(row[0], row[1], row[2], row[3]) for row in rows]
+        # Retrieve all books from the database
+        self.cursor.execute("SELECT id, isbn, title, author FROM books")
+        books = [Book(*row) for row in self.cursor.fetchall()]
+
+        # Define sorting lambda
+        if sort_by_author and sort_by_title:
+            books.sort(key=lambda book: (book.author, book.title))
+        elif sort_by_author:
+            books.sort(key=lambda book: book.author)
+        elif sort_by_title:
+            books.sort(key=lambda book: book.title)
+
+        return books
 
     def get_book_by_id(self, book_id):
         """
