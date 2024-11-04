@@ -1,8 +1,6 @@
 """
 Blueprint for books
 """
-import logging
-
 # pylint: disable=no-else-return
 from flask import Blueprint, jsonify, request
 from book_dao import BookDao, BOOK_DB_NAME
@@ -14,14 +12,11 @@ book_dao = BookDao(BOOK_DB_NAME)
 
 # Higher-order function for executing an operation and handling responses
 # Configure logging
-logging.basicConfig(level=logging.DEBUG)
-
 def execute_and_respond(operation):
     try:
         result, status_code = operation()
         return jsonify(result), status_code
     except Exception as e:
-        logging.error("Error in operation: %s", e)
         return jsonify({'error': str(e)}), 500
 
 
