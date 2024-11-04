@@ -55,6 +55,7 @@ def generate_data():
     user_dao.add_user(User(2, 'user', 'user'))
     user_dao.close()
 
+    # create rented books
     rented_book_dao = RentedBookDao(RENTED_BOOK_DB_NAME)
     rented_book_dao.create_table()
     rented_book_dao.add_rented_book(
