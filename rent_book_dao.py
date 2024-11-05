@@ -1,4 +1,6 @@
 import sqlite3
+from functools import reduce
+
 from rent_book import RentedBook
 from user_dao import UserDao, USER_DB_NAME
 from book_dao import BookDao, BOOK_DB_NAME
@@ -144,3 +146,18 @@ class RentedBookDao:
         """
         execute_query = self.query_executor()
         execute_query('DROP TABLE IF EXISTS rented_books', fetch_all=False)
+
+    def count_rented_books_by_user(self):
+        # Retrieve all rented books
+        rented_books = self.get_all_rented_books()
+
+        # Map: Extract user IDs from rented books
+        user_ids = list(map(lambda rb: rb.user.user_id, rented_books))
+
+        # Filter: Keep only IDs of users with rented books
+        active_rentals = list(filter(lambda uid: uid is not None, user_ids))
+
+        # Reduce: Count occurrences of each user ID (number of rented books per user)
+        rental_count_by_user = reduce(lambda acc, uid: {**acc, uid: acc.get(uid, 0) + 1}, active_rentals, {})
+
+        return rental_count_by_user

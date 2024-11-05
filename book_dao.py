@@ -54,7 +54,7 @@ class BookDao:
 
         # Existing methods...
 
-    def get_all_books(self, sort_by_author=False, sort_by_title=False):
+    def get_all_books(self, sort_by_author=False, sort_by_title=True):
         """
         Retrieves all books from the database and optionally sorts them by author and/or title.
         :param sort_by_author: Sort books by author if True (optional).
@@ -65,13 +65,14 @@ class BookDao:
         self.cursor.execute("SELECT id, isbn, title, author FROM books")
         books = [Book(*row) for row in self.cursor.fetchall()]
 
-        # Define sorting lambda
-        if sort_by_author and sort_by_title:
-            books.sort(key=lambda book: (book.author, book.title))
-        elif sort_by_author:
-            books.sort(key=lambda book: book.author)
-        elif sort_by_title:
-            books.sort(key=lambda book: book.title)
+        # Define multi-var lambda for sorting
+        sorting_key = lambda book: (
+            book.author if sort_by_author else '',
+            book.title if sort_by_title else ''
+        )
+
+        # Sort the books based on the sorting_key lambda
+        books.sort(key=sorting_key)
 
         return books
 

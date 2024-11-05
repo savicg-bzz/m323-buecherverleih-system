@@ -173,6 +173,19 @@ def test_get_all_books(app):
         assert response.json == [] or response.json >= []
 
 
+def test_get_processed_books(app):
+    """
+    Test the get_processed_books route
+    """
+    with app.test_client() as client:
+        response = client.get('/processed_books')
+        assert response.status_code == 200
+        assert isinstance(response.json, dict)
+        assert 'filtered_books' in response.json
+        assert 'total_title_characters' in response.json
+        assert 'uppercase_titles' in response.json
+
+
 def test_get_book_by_isbn(app, book_dao):
     """
     Test the get_book_by_isbn route
@@ -218,6 +231,27 @@ def test_add_rented_book(app):
         response = client.post('/create_rent', json=json_string)
         assert response.status_code == 201
         assert response.json == {'message': 'Rent created'}
+
+
+def test_get_rented_books_count_by_user(app, rented_book_dao):
+    """
+    Test the get_rented_books_count_by_user route
+    """
+    with app.test_client() as client:
+        user = User(1, 'admin', 'admin')
+        book = Book(1, '123', 'Test Book', 'Author')
+
+        # Add rented books for user 1
+        rented_book_dao.add_rented_book(RentedBook(1, user, book, True))
+        rented_book_dao.add_rented_book(RentedBook(2, user, book, True))
+        rented_book_dao.add_rented_book(RentedBook(3, user, book, True))
+        response = client.get('/rented_books/count_by_user')
+        assert response.status_code == 200
+        assert isinstance(response.json, dict)
+        assert '1' in response.json
+        assert '2' in response.json
+        assert response.json['1'] == 2
+        assert response.json['2'] == 1
 
 
 def test_get_rented_book_by_id(app, rented_book_dao, book_dao):

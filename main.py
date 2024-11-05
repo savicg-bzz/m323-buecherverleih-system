@@ -34,37 +34,43 @@ def greet():
     return jsonify("Hello", "myfriend")
 
 
-def generate_data():
-    """
-    This method generates data for the database.
-    """
-    # create books
-
-    book_dao = BookDao(BOOK_DB_NAME)
+def setup_books(book_dao):
     book_dao.create_table()
-    book_dao.add_book(Book(1, '1234', 'Book1', 'Author1'))
-    book_dao.add_book(Book(2, '5678', 'Book2', 'Author2'))
-    book_dao.add_book(Book(3, '91011', 'Book3', 'Author3'))
+    books = [
+        Book(1, '1234', 'Book1', 'Author1'),
+        Book(2, '5678', 'Book2', 'Author2')
+    ]
+    for book in books:
+        book_dao.add_book(book)
     book_dao.close()
 
-    # create users
 
-    user_dao = UserDao(USER_DB_NAME)
+def setup_users(user_dao):
     user_dao.create_table()
-    user_dao.add_user(User(1, 'admin', 'admin'))
-    user_dao.add_user(User(2, 'user', 'user'))
+    users = [
+        User(1, 'admin', 'admin'),
+        User(2, 'user', 'user')
+    ]
+    for user in users:
+        user_dao.add_user(user)
     user_dao.close()
 
-    # create rented books
-    rented_book_dao = RentedBookDao(RENTED_BOOK_DB_NAME)
+
+def setup_rented_books(rented_book_dao):
     rented_book_dao.create_table()
-    rented_book_dao.add_rented_book(
-        RentedBook(1, User(1, 'admin', 'admin'), Book(1, '1234', 'Book1', 'Author1'), True))
-    rented_book_dao.add_rented_book(RentedBook(2, User(2, 'user', 'user'),
-                                               Book(2, '5678', 'Book2', 'Author2'), False))
-    rented_book_dao.add_rented_book(
-        RentedBook(3, User(1, 'admin', 'admin'), Book(3, '91011', 'Book3', 'Author3'), True))
+    rented_books = [
+        RentedBook(1, User(1, 'admin', 'admin'), Book(1, '1234', 'Book1', 'Author1'), True),
+        RentedBook(2, User(2, 'user', 'user'), Book(2, '5678', 'Book2', 'Author2'), False)
+    ]
+    for rented_book in rented_books:
+        rented_book_dao.add_rented_book(rented_book)
     rented_book_dao.close()
+
+
+def generate_data():
+    setup_books(BookDao(BOOK_DB_NAME))
+    setup_users(UserDao(USER_DB_NAME))
+    setup_rented_books(RentedBookDao(RENTED_BOOK_DB_NAME))
 
 
 if __name__ == '__main__':
