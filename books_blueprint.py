@@ -3,7 +3,7 @@ Blueprint for books
 """
 from functools import reduce
 
-# pylint: disable=no-else-return
+# pylint: disable=no-else-return,line-too-long,broad-exception-caught
 from flask import Blueprint, jsonify, request
 from book_dao import BookDao, BOOK_DB_NAME
 from book import Book
@@ -15,6 +15,11 @@ book_dao = BookDao(BOOK_DB_NAME)
 # Higher-order function for executing an operation and handling responses
 # Configure logging
 def execute_and_respond(operation):
+    """
+    This function executes an operation and handles the response.
+    :param operation:
+    :return:
+    """
     try:
         result, status_code = operation()
         return jsonify(result), status_code
@@ -80,6 +85,10 @@ def update_book():
 
 @book_blueprint.route('/processed_books', methods=['GET'])
 def processed_books():
+    """
+    This method demonstrates the use of map, filter, and reduce functions.
+    :return:
+    """
     # Get all books
     books = book_dao.get_all_books()
     # Map: Konvertiert Titel aller Bücher in Grossbuchstaben

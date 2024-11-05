@@ -2,6 +2,7 @@
 Test all Blueprint classes
 """
 # pylint: disable=[line-too-long,redefined-outer-name,duplicate-code]
+import tempfile
 import pytest
 from flask import Flask
 
@@ -14,8 +15,6 @@ from rent_book_dao import RentedBookDao
 from user import User
 from user_blueprint import user_blueprint
 from user_dao import UserDao
-
-import tempfile
 
 
 @pytest.fixture

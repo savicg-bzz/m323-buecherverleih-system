@@ -162,6 +162,10 @@ def update_rent():
 
 @rent_book_blueprint.route('/rented_books/count_by_user', methods=['GET'])
 def count_rented_books_by_user_route():
+    """
+    This method returns the count of rented books by user.
+    :return:
+    """
     # Count rented books by user
     rental_count_by_user = rent_book_dao.count_rented_books_by_user()
     return jsonify(rental_count_by_user)

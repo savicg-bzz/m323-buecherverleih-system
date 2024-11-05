@@ -35,6 +35,11 @@ def greet():
 
 
 def setup_books(book_dao):
+    """
+    This method sets up the books table with some initial data.
+    :param book_dao:
+    :return:
+    """
     book_dao.create_table()
     books = [
         Book(1, '1234', 'Book1', 'Author1'),
@@ -46,6 +51,11 @@ def setup_books(book_dao):
 
 
 def setup_users(user_dao):
+    """
+    This method sets up the users table with some initial data.
+    :param user_dao:
+    :return:
+    """
     user_dao.create_table()
     users = [
         User(1, 'admin', 'admin'),
@@ -57,6 +67,11 @@ def setup_users(user_dao):
 
 
 def setup_rented_books(rented_book_dao):
+    """
+    This method sets up the rented_books table with some initial data.
+    :param rented_book_dao:
+    :return:
+    """
     rented_book_dao.create_table()
     rented_books = [
         RentedBook(1, User(1, 'admin', 'admin'), Book(1, '1234', 'Book1', 'Author1'), True),
@@ -68,6 +83,10 @@ def setup_rented_books(rented_book_dao):
 
 
 def generate_data():
+    """
+    This method generates data for the database.
+    :return:
+    """
     setup_books(BookDao(BOOK_DB_NAME))
     setup_users(UserDao(USER_DB_NAME))
     setup_rented_books(RentedBookDao(RENTED_BOOK_DB_NAME))

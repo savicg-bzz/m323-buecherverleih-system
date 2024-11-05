@@ -1,3 +1,7 @@
+"""
+This module contains the data access object for rented books.
+"""
+# pylint: disable=line-too-long,no-else-return
 import sqlite3
 from functools import reduce
 
@@ -148,6 +152,10 @@ class RentedBookDao:
         execute_query('DROP TABLE IF EXISTS rented_books', fetch_all=False)
 
     def count_rented_books_by_user(self):
+        """
+        This method returns the count of rented books by user.
+        :return:
+        """
         # Retrieve all rented books
         rented_books = self.get_all_rented_books()
 

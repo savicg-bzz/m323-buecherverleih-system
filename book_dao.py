@@ -2,6 +2,7 @@
 This module contains the BookDao class which is responsible for handling all the database
 operations related to the book entity.
 """
+# pylint: disable=unnecessary-lambda-assignment
 import sqlite3
 from book import Book
 
